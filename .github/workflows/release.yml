@@ -1,0 +1,116 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'efemde/**'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    if: "!contains(github.event.head_commit.message, 'Bump version')"
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get current version
+        id: get_version
+        run: |
+          VERSION=$(grep -m1 'MARKETING_VERSION' efemde.xcodeproj/project.pbxproj | sed 's/.*= \(.*\);/\1/')
+          echo "current=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Bump version
+        id: bump_version
+        run: |
+          CURRENT="${{ steps.get_version.outputs.current }}"
+          IFS='.' read -ra PARTS <<< "$CURRENT"
+          MAJOR=${PARTS[0]}
+          MINOR=${PARTS[1]}
+          PATCH=${PARTS[2]}
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+          # Update all MARKETING_VERSION entries in project.pbxproj
+          sed -i '' "s/MARKETING_VERSION = $CURRENT;/MARKETING_VERSION = $NEW_VERSION;/g" efemde.xcodeproj/project.pbxproj
+
+      - name: Build app
+        run: |
+          xcodebuild -scheme efemde -configuration Release -archivePath build/Vellum.xcarchive archive
+          xcodebuild -exportArchive -archivePath build/Vellum.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/export || true
+
+          # If export fails, just copy from archive
+          if [ ! -d "build/export/Vellum.app" ]; then
+            cp -R "build/Vellum.xcarchive/Products/Applications/Vellum.app" build/
+          else
+            cp -R "build/export/Vellum.app" build/
+          fi
+
+      - name: Create zip
+        run: |
+          cd build
+          zip -r "Vellum-${{ steps.bump_version.outputs.version }}.zip" Vellum.app
+          echo "SHA256=$(shasum -a 256 Vellum-${{ steps.bump_version.outputs.version }}.zip | awk '{print $1}')" >> $GITHUB_OUTPUT
+        id: zip
+
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add efemde.xcodeproj/project.pbxproj
+          git commit -m "Bump version to ${{ steps.bump_version.outputs.version }}"
+          git push
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.bump_version.outputs.version }}
+          name: Vellum ${{ steps.bump_version.outputs.version }}
+          files: build/Vellum-${{ steps.bump_version.outputs.version }}.zip
+          generate_release_notes: true
+
+      - name: Update Homebrew cask
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: |
+          if [ -z "$TAP_TOKEN" ]; then
+            echo "TAP_TOKEN not set, skipping homebrew update"
+            exit 0
+          fi
+
+          git clone https://x-access-token:${TAP_TOKEN}@github.com/faisalmirza/homebrew-tap.git
+          cd homebrew-tap
+
+          cat > Casks/vellum-md.rb << EOF
+          cask "vellum-md" do
+            version "${{ steps.bump_version.outputs.version }}"
+            sha256 "${{ steps.zip.outputs.SHA256 }}"
+
+            url "https://github.com/faisalmirza/vellum/releases/download/v#{version}/Vellum-#{version}.zip"
+            name "Vellum"
+            desc "Fast markdown viewer for macOS"
+            homepage "https://github.com/faisalmirza/vellum"
+
+            depends_on macos: ">= :ventura"
+
+            app "Vellum.app"
+
+            zap trash: [
+              "~/Library/Preferences/com.faisalmirza.efemde.plist",
+              "~/Library/Saved Application State/com.faisalmirza.efemde.savedState",
+            ]
+          end
+          EOF
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/vellum-md.rb
+          git commit -m "Update vellum-md to ${{ steps.bump_version.outputs.version }}"
+          git push
