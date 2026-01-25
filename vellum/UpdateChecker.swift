@@ -195,26 +195,20 @@ class UpdateChecker: ObservableObject {
     }
 
     private func downloadWithProgress(from url: URL) async throws -> (URL, URLResponse) {
-        let (asyncBytes, response) = try await URLSession.shared.bytes(from: url)
-
-        let expectedLength = response.expectedContentLength
-        var data = Data()
-        data.reserveCapacity(expectedLength > 0 ? Int(expectedLength) : 1024 * 1024)
-
-        for try await byte in asyncBytes {
-            data.append(byte)
-            if expectedLength > 0 {
-                let progress = Double(data.count) / Double(expectedLength) * 0.7
-                await MainActor.run {
-                    self.downloadProgress = progress
-                }
+        let delegate = DownloadDelegate { [weak self] progress in
+            Task { @MainActor in
+                self?.downloadProgress = progress * 0.7
             }
         }
 
-        let tempFile = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".zip")
-        try data.write(to: tempFile)
+        let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
+        let (localURL, response) = try await session.download(from: url)
 
-        return (tempFile, response)
+        // Move from temp location to our controlled path
+        let destURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".zip")
+        try FileManager.default.moveItem(at: localURL, to: destURL)
+
+        return (destURL, response)
     }
 
     func dismissUpdate() {
@@ -222,6 +216,24 @@ class UpdateChecker: ObservableObject {
         isDownloading = false
         downloadProgress = 0
         updateError = nil
+    }
+}
+
+private class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
+    let progressHandler: (Double) -> Void
+
+    init(progressHandler: @escaping (Double) -> Void) {
+        self.progressHandler = progressHandler
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        // Handled by async/await
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        guard totalBytesExpectedToWrite > 0 else { return }
+        let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+        progressHandler(progress)
     }
 }
 
