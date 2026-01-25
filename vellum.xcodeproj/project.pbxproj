@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B7A10001AAAA000000000001 /* EfemdeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F10001AAAA000000000001 /* EfemdeApp.swift */; };
+		B7A10001AAAA000000000001 /* VellumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F10001AAAA000000000001 /* VellumApp.swift */; };
 		B7A10002AAAA000000000002 /* MarkdownDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F10002AAAA000000000002 /* MarkdownDocument.swift */; };
 		B7A10003AAAA000000000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F10003AAAA000000000003 /* ContentView.swift */; };
 		B7A10004AAAA000000000004 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F10004AAAA000000000004 /* EditorView.swift */; };
@@ -24,7 +24,7 @@
 			containerPortal = B7R00001FFFF000000000001 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = B7T10001GGGG000000000001;
-			remoteInfo = efemde;
+			remoteInfo = vellum;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -43,7 +43,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B7F10001AAAA000000000001 /* EfemdeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EfemdeApp.swift; sourceTree = "<group>"; };
+		B7F10001AAAA000000000001 /* VellumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VellumApp.swift; sourceTree = "<group>"; };
 		B7F10002AAAA000000000002 /* MarkdownDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownDocument.swift; sourceTree = "<group>"; };
 		B7F10003AAAA000000000003 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B7F10004AAAA000000000004 /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
@@ -51,8 +51,8 @@
 		B7F10009AAAA000000000009 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		B7F10006AAAA000000000006 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B7F10007AAAA000000000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B7F10008AAAA000000000008 /* efemde.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = efemde.entitlements; sourceTree = "<group>"; };
-		B7P10001DDDD000000000001 /* efemde.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = efemde.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7F10008AAAA000000000008 /* vellum.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vellum.entitlements; sourceTree = "<group>"; };
+		B7P10001DDDD000000000001 /* vellum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vellum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7F20001BBBB000000000001 /* PreviewProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewProvider.swift; sourceTree = "<group>"; };
 		B7F20002BBBB000000000002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B7P20001DDDD000000000001 /* QuickLookExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = QuickLookExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,16 +79,16 @@
 		B7G00001JJJJ000000000001 = {
 			isa = PBXGroup;
 			children = (
-				B7G10001JJJJ000000000001 /* efemde */,
+				B7G10001JJJJ000000000001 /* vellum */,
 				B7G20001JJJJ000000000001 /* QuickLookExtension */,
 				B7G30001JJJJ000000000001 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		B7G10001JJJJ000000000001 /* efemde */ = {
+		B7G10001JJJJ000000000001 /* vellum */ = {
 			isa = PBXGroup;
 			children = (
-				B7F10001AAAA000000000001 /* EfemdeApp.swift */,
+				B7F10001AAAA000000000001 /* VellumApp.swift */,
 				B7F10002AAAA000000000002 /* MarkdownDocument.swift */,
 				B7F10003AAAA000000000003 /* ContentView.swift */,
 				B7F10004AAAA000000000004 /* EditorView.swift */,
@@ -96,9 +96,9 @@
 				B7F10009AAAA000000000009 /* UpdateChecker.swift */,
 				B7F10006AAAA000000000006 /* Assets.xcassets */,
 				B7F10007AAAA000000000007 /* Info.plist */,
-				B7F10008AAAA000000000008 /* efemde.entitlements */,
+				B7F10008AAAA000000000008 /* vellum.entitlements */,
 			);
-			path = efemde;
+			path = vellum;
 			sourceTree = "<group>";
 		};
 		B7G20001JJJJ000000000001 /* QuickLookExtension */ = {
@@ -113,7 +113,7 @@
 		B7G30001JJJJ000000000001 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B7P10001DDDD000000000001 /* efemde.app */,
+				B7P10001DDDD000000000001 /* vellum.app */,
 				B7P20001DDDD000000000001 /* QuickLookExtension.appex */,
 			);
 			name = Products;
@@ -122,9 +122,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B7T10001GGGG000000000001 /* efemde */ = {
+		B7T10001GGGG000000000001 /* vellum */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B7L10001KKKK000000000001 /* Build configuration list for PBXNativeTarget "efemde" */;
+			buildConfigurationList = B7L10001KKKK000000000001 /* Build configuration list for PBXNativeTarget "vellum" */;
 			buildPhases = (
 				B7S10001LLLL000000000001 /* Sources */,
 				B7K10001IIII000000000001 /* Frameworks */,
@@ -136,9 +136,9 @@
 			dependencies = (
 				B7E10001NNNN000000000001 /* PBXTargetDependency */,
 			);
-			name = efemde;
-			productName = efemde;
-			productReference = B7P10001DDDD000000000001 /* efemde.app */;
+			name = vellum;
+			productName = vellum;
+			productReference = B7P10001DDDD000000000001 /* vellum.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B7T20001GGGG000000000002 /* QuickLookExtension */ = {
@@ -176,7 +176,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B7L00001KKKK000000000000 /* Build configuration list for PBXProject "efemde" */;
+			buildConfigurationList = B7L00001KKKK000000000000 /* Build configuration list for PBXProject "vellum" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -189,7 +189,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B7T10001GGGG000000000001 /* efemde */,
+				B7T10001GGGG000000000001 /* vellum */,
 				B7T20001GGGG000000000002 /* QuickLookExtension */,
 			);
 		};
@@ -218,7 +218,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B7A10001AAAA000000000001 /* EfemdeApp.swift in Sources */,
+				B7A10001AAAA000000000001 /* VellumApp.swift in Sources */,
 				B7A10002AAAA000000000002 /* MarkdownDocument.swift in Sources */,
 				B7A10003AAAA000000000003 /* ContentView.swift in Sources */,
 				B7A10004AAAA000000000004 /* EditorView.swift in Sources */,
@@ -377,15 +377,15 @@
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = efemde/Info.plist;
+				INFOPLIST_FILE = vellum/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.faisalmirza.efemde;
+				MARKETING_VERSION = 1.5.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.faisalmirza.vellum;
 				PRODUCT_NAME = "Vellum";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -405,15 +405,15 @@
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = efemde/Info.plist;
+				INFOPLIST_FILE = vellum/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.faisalmirza.efemde;
+				MARKETING_VERSION = 1.5.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.faisalmirza.vellum;
 				PRODUCT_NAME = "Vellum";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -435,8 +435,8 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.faisalmirza.efemde.quicklook;
+				MARKETING_VERSION = 1.5.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.faisalmirza.vellum.quicklook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -459,8 +459,8 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 1.5.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.faisalmirza.efemde.quicklook;
+				MARKETING_VERSION = 1.5.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.faisalmirza.vellum.quicklook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -471,7 +471,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B7L00001KKKK000000000000 /* Build configuration list for PBXProject "efemde" */ = {
+		B7L00001KKKK000000000000 /* Build configuration list for PBXProject "vellum" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B7X00001OOOO000000000001 /* Debug */,
@@ -480,7 +480,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B7L10001KKKK000000000001 /* Build configuration list for PBXNativeTarget "efemde" */ = {
+		B7L10001KKKK000000000001 /* Build configuration list for PBXNativeTarget "vellum" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B7X10001PPPP000000000001 /* Debug */,

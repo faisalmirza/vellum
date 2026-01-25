@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'efemde/**'
+      - 'vellum/**'
 
 jobs:
   release:
@@ -23,7 +23,7 @@ jobs:
       - name: Get current version
         id: get_version
         run: |
-          VERSION=$(grep -m1 'MARKETING_VERSION' efemde.xcodeproj/project.pbxproj | sed 's/.*= \(.*\);/\1/')
+          VERSION=$(grep -m1 'MARKETING_VERSION' vellum.xcodeproj/project.pbxproj | sed 's/.*= \(.*\);/\1/')
           echo "current=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Bump version
@@ -39,11 +39,11 @@ jobs:
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
           # Update all MARKETING_VERSION entries in project.pbxproj
-          sed -i '' "s/MARKETING_VERSION = $CURRENT;/MARKETING_VERSION = $NEW_VERSION;/g" efemde.xcodeproj/project.pbxproj
+          sed -i '' "s/MARKETING_VERSION = $CURRENT;/MARKETING_VERSION = $NEW_VERSION;/g" vellum.xcodeproj/project.pbxproj
 
       - name: Build app
         run: |
-          xcodebuild -scheme efemde -configuration Release -archivePath build/Vellum.xcarchive archive
+          xcodebuild -scheme vellum -configuration Release -archivePath build/Vellum.xcarchive archive
           xcodebuild -exportArchive -archivePath build/Vellum.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/export || true
 
           # If export fails, just copy from archive
@@ -64,7 +64,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add efemde.xcodeproj/project.pbxproj
+          git add vellum.xcodeproj/project.pbxproj
           git commit -m "Bump version to ${{ steps.bump_version.outputs.version }}"
           git push
 
@@ -103,8 +103,8 @@ jobs:
             app "Vellum.app"
 
             zap trash: [
-              "~/Library/Preferences/com.faisalmirza.efemde.plist",
-              "~/Library/Saved Application State/com.faisalmirza.efemde.savedState",
+              "~/Library/Preferences/com.faisalmirza.vellum.plist",
+              "~/Library/Saved Application State/com.faisalmirza.vellum.savedState",
             ]
           end
           EOF

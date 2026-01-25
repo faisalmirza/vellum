@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct EfemdeApp: App {
+struct VellumApp: App {
     @StateObject private var updateChecker = UpdateChecker.shared
 
     init() {
