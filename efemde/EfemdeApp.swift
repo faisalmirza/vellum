@@ -33,7 +33,7 @@ struct EfemdeApp: App {
     private func showUpToDateAlert() {
         let alert = NSAlert()
         alert.messageText = "You're up to date!"
-        alert.informativeText = "F-MD \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0") is the latest version."
+        alert.informativeText = "Vellum \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0") is the latest version."
         alert.alertStyle = .informational
         alert.addButton(withTitle: "OK")
         alert.runModal()

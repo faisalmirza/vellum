@@ -30,7 +30,7 @@ struct ContentView: View {
                 HStack {
                     Image(systemName: "arrow.down.circle.fill")
                         .foregroundColor(.white)
-                    Text("F-MD \(version) is available")
+                    Text("Vellum \(version) is available")
                         .fontWeight(.medium)
                     Spacer()
                     Button("Download") {

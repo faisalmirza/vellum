@@ -1,23 +1,23 @@
 <p align="center">
-  <img src="logo.png" width="128" height="128" alt="F-MD logo">
+  <img src="logo.png" width="128" height="128" alt="Vellum logo">
 </p>
 
-# F-MD
+# Vellum
 
-Fast markdown viewer + editor for macOS.
+Fast .md viewer for macOS.
 
 ## Installation
 
 ### Homebrew (recommended)
 
 ```bash
-brew install --cask faisalmirza/tap/f-md
+brew install --cask faisalmirza/tap/vellum
 ```
 
 ### Manual
 
 1. Download the latest release from [Releases](https://github.com/faisalmirza/f-md/releases)
-2. Unzip and drag `F-MD.app` to Applications
+2. Unzip and drag `Vellum.app` to Applications
 3. Open the app (see below for first launch)
 
 #### First Launch (app is not notarized)
@@ -25,14 +25,14 @@ brew install --cask faisalmirza/tap/f-md
 macOS will show a warning because the app is not signed with an Apple Developer certificate. To open it:
 
 **Option A: System Settings**
-1. Try to open F-MD.app (it will be blocked)
+1. Try to open Vellum.app (it will be blocked)
 2. Open **System Settings → Privacy & Security**
-3. Scroll down and click **"Open Anyway"** next to the F-MD message
+3. Scroll down and click **"Open Anyway"** next to the Vellum message
 4. Enter your password
 
 **Option B: Terminal**
 ```bash
-xattr -cr /Applications/F-MD.app
+xattr -cr /Applications/Vellum.app
 ```
 Then open the app normally.
 
