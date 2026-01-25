@@ -5,7 +5,7 @@ struct EfemdeApp: App {
     @StateObject private var updateChecker = UpdateChecker.shared
 
     init() {
-        // Check for updates in the background on launch
+        // Check for updates on launch
         UpdateChecker.shared.checkForUpdates()
     }
 
