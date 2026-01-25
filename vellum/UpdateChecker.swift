@@ -154,13 +154,21 @@ class UpdateChecker: ObservableObject {
             let currentAppURL = URL(fileURLWithPath: currentAppPath)
 
             // Create update script that will run after app quits
+            // Uses osascript for admin privileges if needed
             let scriptPath = tempDir.appendingPathComponent("vellum-update.sh")
             let script = """
             #!/bin/bash
             sleep 1
-            rm -rf "\(currentAppURL.path)"
-            cp -R "\(appBundle.path)" "\(currentAppURL.path)"
-            open "\(currentAppURL.path)"
+
+            # Try without admin first
+            if rm -rf "\(currentAppURL.path)" 2>/dev/null && cp -R "\(appBundle.path)" "\(currentAppURL.path)" 2>/dev/null; then
+                open "\(currentAppURL.path)"
+            else
+                # Need admin privileges - use AppleScript
+                osascript -e 'do shell script "rm -rf \\"\(currentAppURL.path)\\" && cp -R \\"\(appBundle.path)\\" \\"\(currentAppURL.path)\\"" with administrator privileges'
+                open "\(currentAppURL.path)"
+            fi
+
             rm -rf "\(extractPath.path)"
             rm -f "\(zipPath.path)"
             rm -f "\(scriptPath.path)"
