@@ -12,6 +12,7 @@
 		B7A10003AAAA000000000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F10003AAAA000000000003 /* ContentView.swift */; };
 		B7A10004AAAA000000000004 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F10004AAAA000000000004 /* EditorView.swift */; };
 		B7A10005AAAA000000000005 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F10005AAAA000000000005 /* PreviewView.swift */; };
+		B7A10009AAAA000000000009 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F10009AAAA000000000009 /* UpdateChecker.swift */; };
 		B7A10006AAAA000000000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B7F10006AAAA000000000006 /* Assets.xcassets */; };
 		B7A20001BBBB000000000001 /* PreviewProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7F20001BBBB000000000001 /* PreviewProvider.swift */; };
 		B7A30001CCCC000000000001 /* QuickLookExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = B7P20001DDDD000000000001 /* QuickLookExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -47,6 +48,7 @@
 		B7F10003AAAA000000000003 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B7F10004AAAA000000000004 /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
 		B7F10005AAAA000000000005 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
+		B7F10009AAAA000000000009 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		B7F10006AAAA000000000006 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B7F10007AAAA000000000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B7F10008AAAA000000000008 /* efemde.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = efemde.entitlements; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 				B7F10003AAAA000000000003 /* ContentView.swift */,
 				B7F10004AAAA000000000004 /* EditorView.swift */,
 				B7F10005AAAA000000000005 /* PreviewView.swift */,
+				B7F10009AAAA000000000009 /* UpdateChecker.swift */,
 				B7F10006AAAA000000000006 /* Assets.xcassets */,
 				B7F10007AAAA000000000007 /* Info.plist */,
 				B7F10008AAAA000000000008 /* efemde.entitlements */,
@@ -220,6 +223,7 @@
 				B7A10003AAAA000000000003 /* ContentView.swift in Sources */,
 				B7A10004AAAA000000000004 /* EditorView.swift in Sources */,
 				B7A10005AAAA000000000005 /* PreviewView.swift in Sources */,
+				B7A10009AAAA000000000009 /* UpdateChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

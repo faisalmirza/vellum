@@ -3,6 +3,7 @@ import AppKit
 
 struct ContentView: View {
     @Binding var document: MarkdownDocument
+    @EnvironmentObject var updateChecker: UpdateChecker
     @State private var previewHTML: String = ""
     @State private var showEditor: Bool = false
     @State private var showFileBrowser: Bool = false
@@ -23,7 +24,36 @@ struct ContentView: View {
     }
 
     var body: some View {
-        HStack(spacing: 0) {
+        VStack(spacing: 0) {
+            // Update banner
+            if updateChecker.updateAvailable, let version = updateChecker.latestVersion {
+                HStack {
+                    Image(systemName: "arrow.down.circle.fill")
+                        .foregroundColor(.white)
+                    Text("F-MD \(version) is available")
+                        .fontWeight(.medium)
+                    Spacer()
+                    Button("Download") {
+                        updateChecker.openReleasePage()
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 4)
+                    .background(Color.white.opacity(0.2))
+                    .cornerRadius(4)
+                    Button(action: { updateChecker.dismissUpdate() }) {
+                        Image(systemName: "xmark")
+                    }
+                    .buttonStyle(.plain)
+                }
+                .font(.system(size: 12))
+                .foregroundColor(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.accentColor)
+            }
+
+            HStack(spacing: 0) {
             // Preview panel (always visible)
             ZStack(alignment: .topTrailing) {
                 PreviewView(html: previewHTML)
@@ -81,6 +111,7 @@ struct ContentView: View {
                 }
                 .frame(width: editorWidth)
                 .transition(.move(edge: .trailing))
+            }
             }
         }
         .frame(minWidth: 400, minHeight: 400)

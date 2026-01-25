@@ -18,7 +18,23 @@ brew install --cask faisalmirza/tap/f-md
 
 1. Download the latest release from [Releases](https://github.com/faisalmirza/f-md/releases)
 2. Unzip and drag `F-MD.app` to Applications
-3. Right-click → Open on first launch (app is not notarized)
+3. Open the app (see below for first launch)
+
+#### First Launch (app is not notarized)
+
+macOS will show a warning because the app is not signed with an Apple Developer certificate. To open it:
+
+**Option A: System Settings**
+1. Try to open F-MD.app (it will be blocked)
+2. Open **System Settings → Privacy & Security**
+3. Scroll down and click **"Open Anyway"** next to the F-MD message
+4. Enter your password
+
+**Option B: Terminal**
+```bash
+xattr -cr /Applications/F-MD.app
+```
+Then open the app normally.
 
 ## Features
 
