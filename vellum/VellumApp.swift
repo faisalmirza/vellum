@@ -3,7 +3,6 @@ import SwiftUI
 @main
 struct VellumApp: App {
     @StateObject private var updateChecker = UpdateChecker.shared
-    @NSApplicationDelegateAdaptor private var appDelegate: AppDelegate
 
     init() {
         // Check for updates on launch
@@ -39,8 +38,4 @@ struct VellumApp: App {
         alert.addButton(withTitle: "OK")
         alert.runModal()
     }
-}
-
-class AppDelegate: NSObject, NSApplicationDelegate {
-    let documentController = DocumentController()
 }
