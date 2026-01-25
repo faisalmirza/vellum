@@ -1,8 +1,10 @@
-# efemde
+<p align="center">
+  <img src="logo.png" width="128" height="128" alt="F-MD logo">
+</p>
 
-Fast markdown editor for macOS with live preview.
+# F-MD
 
-![efemde screenshot](https://github.com/faisalmirza/efemde/assets/screenshot.png)
+Fast markdown viewer + editor for macOS.
 
 ## Installation
 
