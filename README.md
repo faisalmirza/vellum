@@ -11,13 +11,13 @@ Fast markdown viewer + editor for macOS.
 ### Homebrew (recommended)
 
 ```bash
-brew install --cask faisalmirza/tap/efemde
+brew install --cask faisalmirza/tap/f-md
 ```
 
 ### Manual
 
-1. Download the latest release from [Releases](https://github.com/faisalmirza/efemde/releases)
-2. Unzip and drag `efemde.app` to Applications
+1. Download the latest release from [Releases](https://github.com/faisalmirza/f-md/releases)
+2. Unzip and drag `F-MD.app` to Applications
 3. Right-click → Open on first launch (app is not notarized)
 
 ## Features
