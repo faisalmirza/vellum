@@ -30,21 +30,47 @@ struct ContentView: View {
                 HStack {
                     Image(systemName: "arrow.down.circle.fill")
                         .foregroundColor(.white)
-                    Text("Vellum \(version) is available")
-                        .fontWeight(.medium)
-                    Spacer()
-                    Button("Download") {
-                        updateChecker.openReleasePage()
+
+                    if updateChecker.isDownloading {
+                        Text("Updating to \(version)...")
+                            .fontWeight(.medium)
+                        Spacer()
+                        ProgressView(value: updateChecker.downloadProgress)
+                            .progressViewStyle(.linear)
+                            .frame(width: 100)
+                            .tint(.white)
+                    } else if let error = updateChecker.updateError {
+                        Text(error)
+                            .fontWeight(.medium)
+                        Spacer()
+                        Button("Retry") {
+                            updateChecker.performUpdate()
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(Color.white.opacity(0.2))
+                        .cornerRadius(4)
+                    } else {
+                        Text("Vellum \(version) is available")
+                            .fontWeight(.medium)
+                        Spacer()
+                        Button("Update") {
+                            updateChecker.performUpdate()
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(Color.white.opacity(0.2))
+                        .cornerRadius(4)
                     }
-                    .buttonStyle(.plain)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(Color.white.opacity(0.2))
-                    .cornerRadius(4)
-                    Button(action: { updateChecker.dismissUpdate() }) {
-                        Image(systemName: "xmark")
+
+                    if !updateChecker.isDownloading {
+                        Button(action: { updateChecker.dismissUpdate() }) {
+                            Image(systemName: "xmark")
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
                 .font(.system(size: 12))
                 .foregroundColor(.white)

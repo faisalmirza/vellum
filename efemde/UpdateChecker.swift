@@ -7,7 +7,10 @@ class UpdateChecker: ObservableObject {
 
     @Published var updateAvailable = false
     @Published var latestVersion: String?
-    @Published var releaseURL: URL?
+    @Published var downloadURL: URL?
+    @Published var isDownloading = false
+    @Published var downloadProgress: Double = 0
+    @Published var updateError: String?
 
     private let repoOwner = "faisalmirza"
     private let repoName = "vellum"
@@ -39,16 +42,28 @@ class UpdateChecker: ObservableObject {
             }
 
             guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let tagName = json["tag_name"] as? String,
-                  let htmlURL = json["html_url"] as? String else {
+                  let tagName = json["tag_name"] as? String else {
                 return
             }
 
             let latestVersion = tagName.hasPrefix("v") ? String(tagName.dropFirst()) : tagName
 
+            // Find the zip asset download URL
+            var zipURL: URL?
+            if let assets = json["assets"] as? [[String: Any]] {
+                for asset in assets {
+                    if let name = asset["name"] as? String,
+                       name.hasSuffix(".zip"),
+                       let downloadURLString = asset["browser_download_url"] as? String {
+                        zipURL = URL(string: downloadURLString)
+                        break
+                    }
+                }
+            }
+
             if isNewerVersion(latestVersion, than: currentVersion) {
                 self.latestVersion = latestVersion
-                self.releaseURL = URL(string: htmlURL)
+                self.downloadURL = zipURL
                 self.updateAvailable = true
             }
         } catch {
@@ -73,13 +88,156 @@ class UpdateChecker: ObservableObject {
         return false
     }
 
-    func openReleasePage() {
-        if let url = releaseURL {
-            NSWorkspace.shared.open(url)
+    func performUpdate() {
+        guard let downloadURL = downloadURL else {
+            updateError = "No download URL available"
+            return
         }
+
+        isDownloading = true
+        downloadProgress = 0
+        updateError = nil
+
+        Task {
+            await downloadAndInstall(from: downloadURL)
+        }
+    }
+
+    private func downloadAndInstall(from url: URL) async {
+        let tempDir = FileManager.default.temporaryDirectory
+        let zipPath = tempDir.appendingPathComponent("Vellum-update.zip")
+        let extractPath = tempDir.appendingPathComponent("Vellum-update")
+
+        do {
+            // Clean up any previous update attempts
+            try? FileManager.default.removeItem(at: zipPath)
+            try? FileManager.default.removeItem(at: extractPath)
+
+            // Download the zip file with progress
+            let (localURL, _) = try await downloadWithProgress(from: url)
+
+            // Move to our expected path
+            try FileManager.default.moveItem(at: localURL, to: zipPath)
+
+            downloadProgress = 0.7
+
+            // Create extraction directory
+            try FileManager.default.createDirectory(at: extractPath, withIntermediateDirectories: true)
+
+            // Unzip
+            let unzipProcess = Process()
+            unzipProcess.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
+            unzipProcess.arguments = ["-o", zipPath.path, "-d", extractPath.path]
+            unzipProcess.standardOutput = FileHandle.nullDevice
+            unzipProcess.standardError = FileHandle.nullDevice
+            try unzipProcess.run()
+            unzipProcess.waitUntilExit()
+
+            guard unzipProcess.terminationStatus == 0 else {
+                throw UpdateError.extractionFailed
+            }
+
+            downloadProgress = 0.85
+
+            // Find the .app in extracted contents
+            let contents = try FileManager.default.contentsOfDirectory(at: extractPath, includingPropertiesForKeys: nil)
+            guard let appBundle = contents.first(where: { $0.pathExtension == "app" }) else {
+                throw UpdateError.appNotFound
+            }
+
+            downloadProgress = 0.9
+
+            // Get current app path
+            guard let currentAppPath = Bundle.main.bundlePath as String? else {
+                throw UpdateError.installationFailed
+            }
+            let currentAppURL = URL(fileURLWithPath: currentAppPath)
+
+            // Create update script that will run after app quits
+            let scriptPath = tempDir.appendingPathComponent("vellum-update.sh")
+            let script = """
+            #!/bin/bash
+            sleep 1
+            rm -rf "\(currentAppURL.path)"
+            cp -R "\(appBundle.path)" "\(currentAppURL.path)"
+            open "\(currentAppURL.path)"
+            rm -rf "\(extractPath.path)"
+            rm -f "\(zipPath.path)"
+            rm -f "\(scriptPath.path)"
+            """
+
+            try script.write(to: scriptPath, atomically: true, encoding: .utf8)
+
+            // Make script executable
+            let chmodProcess = Process()
+            chmodProcess.executableURL = URL(fileURLWithPath: "/bin/chmod")
+            chmodProcess.arguments = ["+x", scriptPath.path]
+            try chmodProcess.run()
+            chmodProcess.waitUntilExit()
+
+            downloadProgress = 1.0
+
+            // Launch the update script and quit
+            let updateProcess = Process()
+            updateProcess.executableURL = URL(fileURLWithPath: "/bin/bash")
+            updateProcess.arguments = [scriptPath.path]
+            try updateProcess.run()
+
+            // Quit the app to allow update
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                NSApplication.shared.terminate(nil)
+            }
+
+        } catch {
+            isDownloading = false
+            updateError = error.localizedDescription
+        }
+    }
+
+    private func downloadWithProgress(from url: URL) async throws -> (URL, URLResponse) {
+        let (asyncBytes, response) = try await URLSession.shared.bytes(from: url)
+
+        let expectedLength = response.expectedContentLength
+        var data = Data()
+        data.reserveCapacity(expectedLength > 0 ? Int(expectedLength) : 1024 * 1024)
+
+        for try await byte in asyncBytes {
+            data.append(byte)
+            if expectedLength > 0 {
+                let progress = Double(data.count) / Double(expectedLength) * 0.7
+                await MainActor.run {
+                    self.downloadProgress = progress
+                }
+            }
+        }
+
+        let tempFile = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".zip")
+        try data.write(to: tempFile)
+
+        return (tempFile, response)
     }
 
     func dismissUpdate() {
         updateAvailable = false
+        isDownloading = false
+        downloadProgress = 0
+        updateError = nil
+    }
+}
+
+enum UpdateError: LocalizedError {
+    case extractionFailed
+    case appNotFound
+    case installationFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .extractionFailed:
+            return "Failed to extract update"
+        case .appNotFound:
+            return "App not found in update"
+        case .installationFailed:
+            return "Failed to install update"
+        }
     }
 }
