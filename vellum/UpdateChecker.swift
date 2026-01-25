@@ -162,10 +162,11 @@ class UpdateChecker: ObservableObject {
 
             # Try without admin first
             if rm -rf "\(currentAppURL.path)" 2>/dev/null && cp -R "\(appBundle.path)" "\(currentAppURL.path)" 2>/dev/null; then
+                xattr -cr "\(currentAppURL.path)"
                 open "\(currentAppURL.path)"
             else
                 # Need admin privileges - use AppleScript
-                osascript -e 'do shell script "rm -rf \\"\(currentAppURL.path)\\" && cp -R \\"\(appBundle.path)\\" \\"\(currentAppURL.path)\\"" with administrator privileges'
+                osascript -e 'do shell script "rm -rf \\"\(currentAppURL.path)\\" && cp -R \\"\(appBundle.path)\\" \\"\(currentAppURL.path)\\" && xattr -cr \\"\(currentAppURL.path)\\"" with administrator privileges'
                 open "\(currentAppURL.path)"
             fi
 
