@@ -11,7 +11,7 @@ Fast .md viewer for macOS.
 ### Homebrew (recommended)
 
 ```bash
-brew install --cask vellum
+brew install --cask faisalmirza/tap/vellum-md
 ```
 
 ### Manual
