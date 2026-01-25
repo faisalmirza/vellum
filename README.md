@@ -16,7 +16,7 @@ brew install --cask faisalmirza/tap/vellum
 
 ### Manual
 
-1. Download the latest release from [Releases](https://github.com/faisalmirza/f-md/releases)
+1. Download the latest release from [Releases](https://github.com/faisalmirza/vellum/releases)
 2. Unzip and drag `Vellum.app` to Applications
 3. Open the app (see below for first launch)
 

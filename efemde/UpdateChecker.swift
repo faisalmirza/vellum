@@ -10,7 +10,7 @@ class UpdateChecker: ObservableObject {
     @Published var releaseURL: URL?
 
     private let repoOwner = "faisalmirza"
-    private let repoName = "f-md"
+    private let repoName = "vellum"
 
     private var currentVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
