@@ -4,28 +4,44 @@ import Foundation
 class LastFileManager {
     static let shared = LastFileManager()
     
-    private let lastFilePathKey = "LastOpenedFilePath"
+    private let lastFileBookmarkKey = "LastOpenedFileBookmark"
     
     private init() {}
     
-    /// Saves the file path to UserDefaults
+    /// Saves the file bookmark to UserDefaults
     func saveLastOpenedFile(_ url: URL) {
-        UserDefaults.standard.set(url.path, forKey: lastFilePathKey)
+        do {
+            let bookmarkData = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+            UserDefaults.standard.set(bookmarkData, forKey: lastFileBookmarkKey)
+        } catch {
+            print("Failed to create bookmark: \(error)")
+        }
     }
     
     /// Retrieves the last opened file URL if it exists and is accessible
     func getLastOpenedFile() -> URL? {
-        guard let path = UserDefaults.standard.string(forKey: lastFilePathKey) else {
+        guard let bookmarkData = UserDefaults.standard.data(forKey: lastFileBookmarkKey) else {
             return nil
         }
         
-        let url = URL(fileURLWithPath: path)
-        
-        // Check if file exists
-        guard FileManager.default.fileExists(atPath: path) else {
+        do {
+            var isStale = false
+            let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale)
+            
+            // Check if file exists
+            guard FileManager.default.fileExists(atPath: url.path) else {
+                return nil
+            }
+            
+            // If bookmark is stale, update it
+            if isStale {
+                saveLastOpenedFile(url)
+            }
+            
+            return url
+        } catch {
+            print("Failed to resolve bookmark: \(error)")
             return nil
         }
-        
-        return url
     }
 }

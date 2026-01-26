@@ -3,23 +3,24 @@ import SwiftUI
 @main
 struct VellumApp: App {
     @StateObject private var updateChecker = UpdateChecker.shared
+    @StateObject private var appDelegate = AppDelegateHelper()
 
     init() {
         // Check for updates on launch
         UpdateChecker.shared.checkForUpdates()
-        
-        // Restore last opened file on launch
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if let lastFileURL = LastFileManager.shared.getLastOpenedFile() {
-                NSDocumentController.shared.openDocument(withContentsOf: lastFileURL, display: true) { _, _, _ in }
-            }
-        }
     }
 
     var body: some Scene {
         DocumentGroup(newDocument: MarkdownDocument()) { file in
             ContentView(document: file.$document)
                 .environmentObject(updateChecker)
+                .onAppear {
+                    // Restore last opened file after first window appears
+                    if !appDelegate.hasRestoredFile {
+                        appDelegate.hasRestoredFile = true
+                        restoreLastOpenedFile()
+                    }
+                }
         }
         .commands {
             CommandGroup(replacing: .help) { }
@@ -36,6 +37,14 @@ struct VellumApp: App {
             }
         }
     }
+    
+    private func restoreLastOpenedFile() {
+        guard let lastFileURL = LastFileManager.shared.getLastOpenedFile() else {
+            return
+        }
+        
+        NSDocumentController.shared.openDocument(withContentsOf: lastFileURL, display: true) { _, _, _ in }
+    }
 
     private func showUpToDateAlert() {
         let alert = NSAlert()
@@ -45,4 +54,8 @@ struct VellumApp: App {
         alert.addButton(withTitle: "OK")
         alert.runModal()
     }
+}
+
+class AppDelegateHelper: ObservableObject {
+    @Published var hasRestoredFile = false
 }
