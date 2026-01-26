@@ -1,0 +1,62 @@
+name: PR Build
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get PR and issue info
+        id: info
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+          # Get PR body and title to find linked issues
+          PR_BODY="${{ github.event.pull_request.body }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+
+          # Extract issue numbers from common patterns: "Closes #123", "Fixes #123", "Resolves #123", or just "#123"
+          ISSUES=$(echo "$PR_BODY $PR_TITLE" | grep -oE '#[0-9]+' | tr -d '#' | sort -u | head -3 | tr '\n' '-' | sed 's/-$//')
+
+          if [ -n "$ISSUES" ]; then
+            echo "issue_suffix=-issue-$ISSUES" >> $GITHUB_OUTPUT
+          else
+            echo "issue_suffix=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build app
+        run: |
+          xcodebuild -scheme vellum -configuration Release -archivePath build/Vellum.xcarchive archive
+          xcodebuild -exportArchive -archivePath build/Vellum.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/export || true
+
+          # If export fails, just copy from archive
+          if [ ! -d "build/export/Vellum.app" ]; then
+            cp -R "build/Vellum.xcarchive/Products/Applications/Vellum.app" build/
+          else
+            cp -R "build/export/Vellum.app" build/
+          fi
+
+      - name: Rename app with PR and issue info
+        run: |
+          APP_NAME="Vellum-pr-${{ steps.info.outputs.pr_number }}${{ steps.info.outputs.issue_suffix }}.app"
+          mv "build/Vellum.app" "build/$APP_NAME"
+          echo "app_name=$APP_NAME" >> $GITHUB_ENV
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.app_name }}
+          path: build/${{ env.app_name }}
+          compression-level: 0
