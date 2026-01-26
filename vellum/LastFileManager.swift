@@ -1,6 +1,7 @@
 import Foundation
 
 /// Manages persistence of the last opened file path using UserDefaults
+/// Uses security-scoped bookmarks for sandboxed app support
 class LastFileManager {
     static let shared = LastFileManager()
     
