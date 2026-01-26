@@ -1,5 +1,6 @@
 import SwiftUI
 
+/// Main Vellum application with document-based architecture and QuickLook extension
 @main
 struct VellumApp: App {
     @StateObject private var updateChecker = UpdateChecker.shared
