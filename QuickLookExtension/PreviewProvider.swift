@@ -93,10 +93,12 @@ if(__exports != exports)module.exports = exports;return module.exports}));
             <style>
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                    padding: 20px;
+                    padding: 20px 40px;
                     line-height: 1.6;
                     color: #333;
                     background: #fff;
+                    max-width: 720px;
+                    margin: 0 auto;
                 }
                 @media (prefers-color-scheme: dark) {
                     body { background: #1e1e1e; color: #d4d4d4; }
