@@ -161,9 +161,12 @@ struct ContentView: View {
             setupWindowFrameAutosave()
             
             // Save current file if opened through standard mechanism
-            if let currentDoc = NSDocumentController.shared.currentDocument,
-               let fileURL = currentDoc.fileURL {
-                LastFileManager.shared.saveLastOpenedFile(fileURL)
+            // Delay slightly to ensure document is fully loaded
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if let currentDoc = NSDocumentController.shared.currentDocument,
+                   let fileURL = currentDoc.fileURL {
+                    LastFileManager.shared.saveLastOpenedFile(fileURL)
+                }
             }
         }
     }
