@@ -29,15 +29,6 @@ class LastFileManager {
             var isStale = false
             let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale)
             
-            // Start accessing security-scoped resource
-            guard url.startAccessingSecurityScopedResource() else {
-                print("Failed to access security-scoped resource")
-                return nil
-            }
-            defer {
-                url.stopAccessingSecurityScopedResource()
-            }
-            
             // Check if file exists
             guard FileManager.default.fileExists(atPath: url.path()) else {
                 return nil
