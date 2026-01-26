@@ -7,6 +7,13 @@ struct VellumApp: App {
     init() {
         // Check for updates on launch
         UpdateChecker.shared.checkForUpdates()
+        
+        // Restore last opened file on launch
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if let lastFileURL = LastFileManager.shared.getLastOpenedFile() {
+                NSDocumentController.shared.openDocument(withContentsOf: lastFileURL, display: true) { _, _, _ in }
+            }
+        }
     }
 
     var body: some Scene {

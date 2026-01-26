@@ -85,6 +85,18 @@ struct ContentView: View {
                 PreviewView(html: previewHTML)
 
                 HStack(spacing: 8) {
+                    // Open file button
+                    Button(action: { openFileDialog() }) {
+                        Image(systemName: "folder")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 32, height: 32)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Open file...")
+                    
                     // File browser button
                     Button(action: { loadSiblingFiles(); showFileBrowser.toggle() }) {
                         Image(systemName: "doc.text")
@@ -147,6 +159,12 @@ struct ContentView: View {
         .onAppear {
             updatePreview(document.text)
             setupWindowFrameAutosave()
+            
+            // Save current file if opened through standard mechanism
+            if let currentDoc = NSDocumentController.shared.currentDocument,
+               let fileURL = currentDoc.fileURL {
+                LastFileManager.shared.saveLastOpenedFile(fileURL)
+            }
         }
     }
 
@@ -194,6 +212,21 @@ struct ContentView: View {
         }
     }
 
+    private func openFileDialog() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.canChooseFiles = true
+        panel.allowedContentTypes = [.markdown, .plainText]
+        panel.message = "Choose a markdown file to open"
+        
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                openFile(url)
+            }
+        }
+    }
+
     private func openFile(_ url: URL) {
         showFileBrowser = false
 
@@ -215,6 +248,9 @@ struct ContentView: View {
                 window.representedURL = url
                 window.isDocumentEdited = false
             }
+
+            // Save as last opened file
+            LastFileManager.shared.saveLastOpenedFile(url)
 
             // Clear change count after a brief delay to ensure SwiftUI has processed
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
