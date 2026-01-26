@@ -18,14 +18,11 @@ jobs:
       - name: Get PR and issue info
         id: info
         env:
-          GH_TOKEN: ${{ github.token }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-
-          # Get PR body and title to find linked issues
-          PR_BODY="${{ github.event.pull_request.body }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
 
           # Extract issue numbers from common patterns: "Closes #123", "Fixes #123", "Resolves #123", or just "#123"
           ISSUES=$(echo "$PR_BODY $PR_TITLE" | grep -oE '#[0-9]+' | tr -d '#' | sort -u | head -3 | tr '\n' '-' | sed 's/-$//')
