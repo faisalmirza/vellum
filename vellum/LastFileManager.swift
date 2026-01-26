@@ -29,7 +29,7 @@ class LastFileManager {
             let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale)
             
             // Check if file exists
-            guard FileManager.default.fileExists(atPath: url.path) else {
+            guard FileManager.default.fileExists(atPath: url.path()) else {
                 return nil
             }
             

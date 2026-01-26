@@ -43,7 +43,11 @@ struct VellumApp: App {
             return
         }
         
-        NSDocumentController.shared.openDocument(withContentsOf: lastFileURL, display: true) { _, _, _ in }
+        NSDocumentController.shared.openDocument(withContentsOf: lastFileURL, display: true) { document, wasAlreadyOpen, error in
+            if let error = error {
+                print("Failed to restore last opened file: \(error)")
+            }
+        }
     }
 
     private func showUpToDateAlert() {
