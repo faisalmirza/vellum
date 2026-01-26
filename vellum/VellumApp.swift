@@ -1,12 +1,43 @@
 import SwiftUI
 
+// Helper class to manage launch observer lifecycle
+class LaunchObserver {
+    private var observer: NSObjectProtocol?
+    
+    func setupObserver() {
+        observer = NotificationCenter.default.addObserver(
+            forName: NSApplication.didFinishLaunchingNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            VellumApp.restoreLastOpenedFile()
+            self?.removeObserver()
+        }
+    }
+    
+    private func removeObserver() {
+        if let observer = observer {
+            NotificationCenter.default.removeObserver(observer)
+            self.observer = nil
+        }
+    }
+    
+    deinit {
+        removeObserver()
+    }
+}
+
 @main
 struct VellumApp: App {
     @StateObject private var updateChecker = UpdateChecker.shared
+    private let launchObserver = LaunchObserver()
 
     init() {
         // Check for updates on launch
         UpdateChecker.shared.checkForUpdates()
+        
+        // Setup last file restoration observer
+        launchObserver.setupObserver()
     }
 
     var body: some Scene {
@@ -26,6 +57,18 @@ struct VellumApp: App {
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    private static func restoreLastOpenedFile() {
+        guard let lastFileURL = LastFileManager.shared.getLastOpenedFile() else {
+            return
+        }
+        
+        NSDocumentController.shared.openDocument(withContentsOf: lastFileURL, display: true) { document, wasAlreadyOpen, error in
+            if let error = error {
+                print("Failed to restore last opened file: \(error)")
             }
         }
     }
