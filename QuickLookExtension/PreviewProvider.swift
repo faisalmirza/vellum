@@ -1,6 +1,8 @@
 import Cocoa
 import Quartz
+import QuickLook
 
+@objc(PreviewProvider)
 class PreviewProvider: QLPreviewProvider, QLPreviewingController {
     
     // Marked.js library inlined for sandbox compatibility

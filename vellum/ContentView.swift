@@ -100,6 +100,19 @@ struct ContentView: View {
                         FileBrowserView(files: siblingFiles, currentFile: currentFileURL, onSelect: openFile)
                     }
 
+                    // Show in Finder button
+                    Button(action: showInFinder) {
+                        Image(systemName: "folder")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .frame(width: 32, height: 32)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Show in Finder")
+                    .disabled(currentFileURL == nil)
+
                     // Toggle editor button
                     Button(action: toggleEditor) {
                         Image(systemName: showEditor ? "sidebar.right" : "sidebar.left")
@@ -154,6 +167,11 @@ struct ContentView: View {
         withAnimation(.easeInOut(duration: 0.25)) {
             showEditor.toggle()
         }
+    }
+
+    private func showInFinder() {
+        guard let url = currentFileURL else { return }
+        NSWorkspace.shared.activateFileViewerSelecting([url])
     }
 
     private func updatePreview(_ markdown: String) {
