@@ -3,14 +3,16 @@
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>developer-id</string>
+    <string>app-store-connect</string>
     <key>teamID</key>
     <string>RFW3QATUR9</string>
     <key>destination</key>
-    <string>export</string>
+    <string>upload</string>
     <key>signingStyle</key>
     <string>manual</string>
     <key>signingCertificate</key>
-    <string>Developer ID Application</string>
+    <string>Apple Distribution</string>
+    <key>installerSigningCertificate</key>
+    <string>3rd Party Mac Developer Installer</string>
 </dict>
 </plist>
