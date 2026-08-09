@@ -3,20 +3,27 @@ import SwiftUI
 /// Vellum - A fast markdown viewer for macOS with QuickLook extension
 @main
 struct VellumApp: App {
+    #if !APP_STORE
     @StateObject private var updateChecker = UpdateChecker.shared
+    #endif
 
     init() {
+        #if !APP_STORE
         // Check for updates on launch
         UpdateChecker.shared.checkForUpdates()
+        #endif
     }
 
     var body: some Scene {
         DocumentGroup(newDocument: MarkdownDocument()) { file in
             ContentView(document: file.$document)
+                #if !APP_STORE
                 .environmentObject(updateChecker)
+                #endif
         }
         .commands {
             CommandGroup(replacing: .help) { }
+            #if !APP_STORE
             CommandGroup(after: .appInfo) {
                 Button("Check for Updates...") {
                     UpdateChecker.shared.checkForUpdates()
@@ -28,9 +35,11 @@ struct VellumApp: App {
                     }
                 }
             }
+            #endif
         }
     }
 
+    #if !APP_STORE
     private func showUpToDateAlert() {
         let alert = NSAlert()
         alert.messageText = "You're up to date!"
@@ -39,4 +48,5 @@ struct VellumApp: App {
         alert.addButton(withTitle: "OK")
         alert.runModal()
     }
+    #endif
 }

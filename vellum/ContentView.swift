@@ -3,7 +3,9 @@ import AppKit
 
 struct ContentView: View {
     @Binding var document: MarkdownDocument
+    #if !APP_STORE
     @EnvironmentObject var updateChecker: UpdateChecker
+    #endif
     @State private var previewHTML: String = ""
     @State private var showEditor: Bool = false
     @State private var showFileBrowser: Bool = false
@@ -25,6 +27,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            #if !APP_STORE
             // Update banner
             if updateChecker.updateAvailable, let version = updateChecker.latestVersion {
                 HStack {
@@ -78,6 +81,7 @@ struct ContentView: View {
                 .padding(.vertical, 8)
                 .background(Color.accentColor)
             }
+            #endif
 
             HStack(spacing: 0) {
             // Preview panel (always visible)

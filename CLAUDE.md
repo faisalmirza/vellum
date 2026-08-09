@@ -8,10 +8,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Debug build
 xcodebuild -scheme vellum -configuration Debug build
 
-# Release archive
+# Release archive (Developer ID - direct distribution / Homebrew)
 xcodebuild -scheme vellum -configuration Release -archivePath build/Vellum.xcarchive archive
 
-# Export app from archive
+# App Store archive
+xcodebuild -scheme vellum-appstore -configuration AppStore -archivePath build/Vellum-AppStore.xcarchive archive
+
+# Export app from archive (Developer ID)
 xcodebuild -exportArchive -archivePath build/Vellum.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/export
 ```
 
@@ -35,9 +38,10 @@ Vellum is a SwiftUI markdown viewer for macOS with AppKit integration for native
 ## Key Patterns
 
 - **AppKit bridges**: NSViewRepresentable used for NSTextView (editor) and WKWebView (preview)
-- **Self-update mechanism**: Downloads zip, extracts, spawns bash script to replace app while terminating, then relaunches
+- **Self-update mechanism**: Downloads zip, extracts, spawns bash script to replace app while terminating, then relaunches. Disabled in App Store builds via `#if !APP_STORE`.
 - **Markdown pipeline**: Text → JavaScript escape → marked.js → HTML → WebView
 - **State management**: @StateObject for UpdateChecker singleton, @Binding for document text
+- **Conditional compilation**: `APP_STORE` Swift flag disables self-update UI and UpdateChecker in App Store builds
 
 ## Release Process
 
@@ -47,8 +51,17 @@ Automated via `.github/workflows/release.yml`:
 - Builds, archives, creates GitHub release
 - Updates homebrew cask (requires TAP_TOKEN secret)
 
+## Code Signing & Distribution
+
+- **Team ID**: RFW3QATUR9
+- **Two distribution channels**:
+  - **Developer ID** (Release config): Direct download / Homebrew. Sandbox disabled, self-update enabled. Uses `vellum/vellum.entitlements`.
+  - **App Store** (AppStore config): Mac App Store. Sandbox enabled, self-update disabled. Uses `vellum/vellum-appstore.entitlements`.
+- **Schemes**: `vellum` (Developer ID), `vellum-appstore` (App Store)
+- **Notarization**: Credentials stored in Keychain as profile "Vellum-Notarize". Submit via `xcrun notarytool submit --keychain-profile "Vellum-Notarize" --wait`
+
 ## Notes
 
-- App sandbox disabled in entitlements to allow shell script execution for updates
 - Bundle identifier: `com.faisalmirza.vellum`
+- QuickLook extension identifier: `com.faisalmirza.vellum.quicklook`
 - Minimum macOS: 13.0 (Ventura)
