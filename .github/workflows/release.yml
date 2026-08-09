@@ -31,34 +31,99 @@ jobs:
         run: |
           CURRENT="${{ steps.get_version.outputs.current }}"
           IFS='.' read -ra PARTS <<< "$CURRENT"
-          MAJOR=${PARTS[0]}
-          MINOR=${PARTS[1]}
-          PATCH=${PARTS[2]}
-          NEW_PATCH=$((PATCH + 1))
-          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+          NEW_VERSION="${PARTS[0]}.${PARTS[1]}.$((PARTS[2] + 1))"
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-
-          # Update all MARKETING_VERSION entries in project.pbxproj
           sed -i '' "s/MARKETING_VERSION = $CURRENT;/MARKETING_VERSION = $NEW_VERSION;/g" vellum.xcodeproj/project.pbxproj
 
-      - name: Build app
+      # --- NEW: without this the runner has no cert and xcodebuild falls back to ad-hoc ---
+      - name: Import Developer ID certificate
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
-          xcodebuild -scheme vellum -configuration Release -archivePath build/Vellum.xcarchive archive
-          xcodebuild -exportArchive -archivePath build/Vellum.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/export || true
+          set -euo pipefail
+          CERT_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-          # If export fails, just copy from archive
-          if [ ! -d "build/export/Vellum.app" ]; then
-            cp -R "build/Vellum.xcarchive/Products/Applications/Vellum.app" build/
-          else
-            cp -R "build/export/Vellum.app" build/
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o "$CERT_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          security import "$CERT_PATH" -P "$P12_PASSWORD" -A \
+            -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: \
+            -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH" > /dev/null
+          security list-keychain -d user -s "$KEYCHAIN_PATH" login.keychain
+
+          echo "Identities available:"
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH"
+
+      - name: Build and export (universal, Developer ID)
+        run: |
+          set -euo pipefail
+          xcodebuild -scheme vellum -configuration Release \
+            -archivePath build/Vellum.xcarchive \
+            ARCHS="x86_64 arm64" ONLY_ACTIVE_ARCH=NO \
+            archive
+
+          # NOTE: no "|| true" and no cp fallback. A signing failure must fail the
+          # build rather than silently shipping an ad-hoc binary.
+          xcodebuild -exportArchive \
+            -archivePath build/Vellum.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build/export
+
+      - name: Verify signature before notarizing
+        run: |
+          set -euo pipefail
+          APP=build/export/Vellum.app
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          codesign -dv --verbose=4 "$APP" 2>&1 | grep "Authority=Developer ID Application"
+          # Fail loudly if we somehow produced an ad-hoc binary again
+          if codesign -dv "$APP" 2>&1 | grep -q "adhoc"; then
+            echo "ERROR: app is ad-hoc signed"; exit 1
           fi
+          lipo -info "$APP/Contents/MacOS/Vellum"
 
-      - name: Create zip
+      # --- NEW: notarization was entirely absent before ---
+      - name: Notarize and staple
+        env:
+          NOTARY_KEY_BASE64: ${{ secrets.NOTARY_KEY_BASE64 }}
+          NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+          NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
         run: |
-          cd build
-          zip -r "Vellum-${{ steps.bump_version.outputs.version }}.zip" Vellum.app
-          echo "SHA256=$(shasum -a 256 Vellum-${{ steps.bump_version.outputs.version }}.zip | awk '{print $1}')" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          KEY_PATH=$RUNNER_TEMP/notary_key.p8
+          echo -n "$NOTARY_KEY_BASE64" | base64 --decode -o "$KEY_PATH"
+
+          # ditto, not zip: preserves bundle structure and signature metadata
+          ditto -c -k --keepParent build/export/Vellum.app "$RUNNER_TEMP/notarize.zip"
+
+          xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
+            --key "$KEY_PATH" \
+            --key-id "$NOTARY_KEY_ID" \
+            --issuer "$NOTARY_ISSUER_ID" \
+            --wait
+
+          xcrun stapler staple build/export/Vellum.app
+          xcrun stapler validate build/export/Vellum.app
+          spctl -a -vvv -t exec build/export/Vellum.app
+
+      - name: Create distribution zip
         id: zip
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.bump_version.outputs.version }}"
+          # Zip AFTER stapling so the release artifact carries the ticket
+          ditto -c -k --keepParent build/export/Vellum.app "build/Vellum-${VERSION}.zip"
+          echo "SHA256=$(shasum -a 256 "build/Vellum-${VERSION}.zip" | awk '{print $1}')" >> $GITHUB_OUTPUT
+
+      - name: Clean up keychain
+        if: always()
+        run: security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
 
       - name: Commit version bump
         run: |
