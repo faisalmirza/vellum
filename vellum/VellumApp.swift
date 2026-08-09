@@ -1,6 +1,10 @@
 import SwiftUI
 
 /// Vellum - A fast markdown viewer for macOS with QuickLook extension
+///
+/// The self-update machinery is compiled out of App Store builds, which set
+/// the APP_STORE flag in the AppStore configuration. Developer ID builds
+/// (Release, shipped via Homebrew) leave it undefined and keep the updater.
 @main
 struct VellumApp: App {
     #if !APP_STORE
